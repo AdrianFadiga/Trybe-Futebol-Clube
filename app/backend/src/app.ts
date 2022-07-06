@@ -8,8 +8,6 @@ class App {
 
     this.config();
 
-    //xablau
-
     // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
   }
