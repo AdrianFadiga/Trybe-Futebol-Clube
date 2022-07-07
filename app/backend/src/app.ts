@@ -1,5 +1,10 @@
 import * as express from 'express';
+import { Response, Request, NextFunction } from 'express';
+import * as dotenv from 'dotenv';
+import LoginRouter from './database/routers/Login';
+import IResponseError from './database/interfaces/IResponseError';
 
+dotenv.config();
 class App {
   public app: express.Express;
 
@@ -8,7 +13,6 @@ class App {
 
     this.config();
 
-    // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
   }
 
@@ -22,6 +26,11 @@ class App {
 
     this.app.use(express.json());
     this.app.use(accessControl);
+    this.app.use('/login', LoginRouter);
+    this.app.use((err: IResponseError, _req: Request, res: Response, _next: NextFunction) => {
+      if (err.status) return res.status(err.status).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
+    });
   }
 
   public start(PORT: string | number):void {
