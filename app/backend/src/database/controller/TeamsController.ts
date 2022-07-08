@@ -13,7 +13,7 @@ export default class TeamsController {
       const team = await TeamsService.getById(id);
       return res.status(200).json(team);
     } catch (err) {
-      next();
+      next(err);
     }
   }
 }

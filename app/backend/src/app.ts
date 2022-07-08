@@ -2,6 +2,7 @@ import * as express from 'express';
 import { Response, Request, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
 import LoginRouter from './database/routers/Login';
+import TeamsRouter from './database/routers/Teams';
 import IResponseError from './database/interfaces/IResponseError';
 
 dotenv.config();
@@ -27,6 +28,7 @@ class App {
     this.app.use(express.json());
     this.app.use(accessControl);
     this.app.use('/login', LoginRouter);
+    this.app.use('/teams', TeamsRouter);
     this.app.use((err: IResponseError, _req: Request, res: Response, _next: NextFunction) => {
       if (err.status) return res.status(err.status).json({ message: err.message });
       return res.status(500).json({ message: err.message });

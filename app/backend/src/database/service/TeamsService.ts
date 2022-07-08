@@ -14,7 +14,7 @@ export default class TeamsService {
 
   static async getById(id: string) {
     const team = await Team.findOne({ where: { id } });
-    if (!team) throw errorObj(450, 'time sem id');
+    if (!team) throw errorObj(404, 'Id não encontrado');
     return team;
   }
 }
