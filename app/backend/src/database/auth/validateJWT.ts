@@ -4,7 +4,6 @@ import IRequest from '../interfaces/IRequest';
 
 export default class ValidateJWT {
   static async validateToken(req: IRequest, res: Response, next: NextFunction) {
-    console.log(req.headers.authorization);
     const token = req.headers.authorization;
     if (!token) {
       return res.status(401).json({ message: 'Token not found' });
