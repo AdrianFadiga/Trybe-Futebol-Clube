@@ -16,7 +16,7 @@ const { expect } = chai;
 
 describe('Testes da rota de Teams', () => {
     describe('get /login de SUCESSO', () => {
-        const teamsMock = [	{
+        const teamsMock = [{
             id: 1,
             teamName: "Avaí/Kindermann"
         },
@@ -33,7 +33,7 @@ describe('Testes da rota de Teams', () => {
             .resolves(teamsMock as ITeam[])
         });
         after(() => {
-            (Team.findAll as sinon.SinonStub).restore()
+            (Team.findAll as sinon.SinonStub).restore();
         });
         it('Retorna o status 200 com uma lista de times', async () => {
             const response = await chai.request(app).get('/teams')

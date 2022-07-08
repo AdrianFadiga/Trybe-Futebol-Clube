@@ -25,6 +25,7 @@ describe('Testes da rota de Login', () => {
       });
     after(() => { 
       (User.findOne as sinon.SinonStub).restore();
+      (bcrypt.compare as sinon.SinonStub).restore();
      });
     it('Retorna um token e o status 200', async () => { 
       const response = await chai.request(app).post('/login').send({
