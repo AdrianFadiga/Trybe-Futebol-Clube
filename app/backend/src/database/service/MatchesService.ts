@@ -58,4 +58,8 @@ export default class MatchesService {
   static async finishMatch(id: string) {
     await Match.update({ inProgress: 0 }, { where: { id } });
   }
+
+  static async updateMatch({ id, homeTeamGoals, awayTeamGoals }: MatchInfo) {
+    await Match.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
+  }
 }
