@@ -13,7 +13,7 @@ export default class ValidateJWT {
       req.payload = payload.data;
       next();
     } catch (err) {
-      return res.status(401).json({ message: 'Expired or invalid token' });
+      return res.status(401).json({ message: 'Token must be a valid token' });
     }
   }
 }
