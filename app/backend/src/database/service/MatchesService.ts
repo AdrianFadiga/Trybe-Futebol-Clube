@@ -1,5 +1,6 @@
 import Match from '../models/Match';
 import Team from '../models/Team';
+import MatchInfo from '../types/MatchInfo';
 
 export default class MatchesService {
   static async getAll() {
@@ -20,12 +21,25 @@ export default class MatchesService {
       include: [{
         model: Team,
         as: 'teamHome',
-        // attributes: ['teamName'],
       }, {
         model: Team,
         as: 'teamHome',
-        // attributes: ['teamName'],
       }] });
     return matches;
+  }
+
+  static async create(matchInfo: MatchInfo) {
+    const newMatch = Match.create({
+      homeTeam: matchInfo.homeTeam,
+      awayTeam: matchInfo.awayTeam,
+      homeTeamGoals: matchInfo.homeTeamGoals,
+      awayTeamGoals: matchInfo.awayTeamGoals,
+      inProgress: 1,
+    });
+    return newMatch;
+  }
+
+  static async finishMatch() {
+    console.log('service');
   }
 }
