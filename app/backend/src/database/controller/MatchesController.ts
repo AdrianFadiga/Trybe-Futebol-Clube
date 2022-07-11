@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import IRequest from '../interfaces/IRequest';
 import MatchesService from '../service/MatchesService';
+import IdAndInProgress from '../types/IdAndInProgress';
 
 export default class MatchesController {
   static async getAll(req: Request, res: Response) {
@@ -23,7 +24,9 @@ export default class MatchesController {
     return res.status(201).json(match);
   }
 
-  static async finishMatch() {
-    console.log('finish');
+  static async finishMatch(req: Request, res: Response) {
+    const { id } = req.params;
+    await MatchesService.finishMatch(id);
+    return res.status(200).json({ message: 'Finished' });
   }
 }

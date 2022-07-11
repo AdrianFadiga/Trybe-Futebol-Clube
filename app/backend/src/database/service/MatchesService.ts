@@ -1,5 +1,6 @@
 import Match from '../models/Match';
 import Team from '../models/Team';
+import IdAndInProgress from '../types/IdAndInProgress';
 import MatchInfo from '../types/MatchInfo';
 
 export default class MatchesService {
@@ -39,7 +40,7 @@ export default class MatchesService {
     return newMatch;
   }
 
-  static async finishMatch() {
-    console.log('service');
+  static async finishMatch(id: string) {
+    await Match.update({ inProgress: 0 }, { where: { id } });
   }
 }
