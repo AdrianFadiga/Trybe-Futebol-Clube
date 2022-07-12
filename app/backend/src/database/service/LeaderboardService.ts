@@ -1,60 +1,34 @@
-/* eslint-disable max-lines-per-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import IMatch from '../interfaces/IMatch';
 import Match from '../models/Match';
+import Leaderboard from '../types/Leaderboard';
+import utils from '../utils/utils';
 import Team from '../models/Team';
-import MatchInfo from '../types/MatchInfo';
 
 class LeaderboardService {
-  static async generateTeamsArray(matches: any) {
-    const teams = await Team.findAll();
-    const xablau = matches.reduce((acc: any, curr: any) => {
-      const nomeDoTime = teams.find((t) => t.id === curr.homeTeam);
-      if (acc.every((t: any) => t.id !== curr.homeTeam)) {
-        acc.push({
-          name: nomeDoTime?.teamName,
-          id: curr.homeTeam,
-          totalPoints: 0,
-          totalGames: 0,
-          totalVictories: 0,
-          totalLosses: 0,
-          totalDraws: 0,
-          goalsFavor: 0,
-          goalsOwn: 0,
-          goalsBalance: 0,
-          efficiency: 0,
-        });
-      }
-      return acc;
-    }, []);
-    return xablau;
-  }
-
-  static updateTeamScore(teamsArray: any, matches: any) {
-    return matches.reduce((acc: any, { homeTeam, homeTeamGoals, awayTeamGoals }: any) => {
-      const xablau = acc.find((team: any) => team.id === homeTeam);
-      if (homeTeamGoals > awayTeamGoals) xablau.totalVictories += 1;
-      if (homeTeamGoals === awayTeamGoals) xablau.totalDraws += 1;
-      if (homeTeamGoals < awayTeamGoals) xablau.totalLosses += 1;
+  static updateTeamScore(teamsArray: Leaderboard[], matches: IMatch[]) {
+    return matches.reduce((acc, curr) => {
+      const xablau = acc.find((team) => team.id === curr.homeTeam);
+      if (!xablau) return acc;
+      if (curr.homeTeamGoals > curr.awayTeamGoals) xablau.totalVictories += 1;
+      if (curr.homeTeamGoals === curr.awayTeamGoals) xablau.totalDraws += 1;
+      if (curr.homeTeamGoals < curr.awayTeamGoals) xablau.totalLosses += 1;
       xablau.totalPoints = (xablau.totalVictories * 3) + xablau.totalDraws;
       xablau.totalGames += 1;
-      xablau.goalsFavor += homeTeamGoals;
-      xablau.goalsOwn += awayTeamGoals;
+      xablau.goalsFavor += curr.homeTeamGoals;
+      xablau.goalsOwn += curr.awayTeamGoals;
       xablau.goalsBalance = xablau.goalsFavor - xablau.goalsOwn;
       xablau.efficiency = (xablau.totalPoints / (xablau.totalGames * 3)) * 100;
       return acc;
-    }, teamsArray).sort((a: any, b: any) => b.totalPoints - a.totalPoints
-    || b.totalVictories - a.totalVictories
-    || b.goalsBalance - a.goalsBalance
-    || b.goalsFavor - a.goalsFavor
-    || b.goalsOwn - a.goalsOwn);
+    }, teamsArray);
   }
 
   static async getHomeLeaderboard() {
-    const matches = await Match.findAll({ where: { inProgress: false },
-      attributes: ['homeTeam', 'homeTeamGoals', 'awayTeamGoals'] }) as any;
-    const teamsArray = await LeaderboardService.generateTeamsArray(matches);
+    const matches = await Match.findAll({ where: { inProgress: false } });
+    const teams = await Team.findAll();
+    const teamsArray = utils.generateTeamsArray(matches, teams);
     const leaderboards = LeaderboardService.updateTeamScore(teamsArray, matches);
-    return leaderboards;
+    const sortedLeaderboards = utils.sortLeaderboards(leaderboards);
+    return sortedLeaderboards;
   }
 }
 
