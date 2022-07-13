@@ -3,7 +3,7 @@ import IRequest from '../interfaces/IRequest';
 import LoginService from '../service/LoginService';
 
 export default class LoginController {
-  static async Login(req: Request, res: Response, next: NextFunction) {
+  Login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
       const token = await LoginService.Login(email, password);
@@ -11,7 +11,7 @@ export default class LoginController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
   static async CheckRole(req: IRequest, res: Response, next: NextFunction) {
     try {

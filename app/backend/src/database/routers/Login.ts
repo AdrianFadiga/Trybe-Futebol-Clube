@@ -7,6 +7,6 @@ const router: express.Router = express.Router();
 
 router.get('/validate', ValidateJWT.validateToken, LoginController.CheckRole);
 
-router.post('/', Middleware.validateLogin, LoginController.Login);
+router.post('/', Middleware.validateLogin, new LoginController().Login);
 
 export default router;
