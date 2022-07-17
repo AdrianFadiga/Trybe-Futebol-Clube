@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import IMatch from '../interfaces/IMatch';
 import ITeam from '../interfaces/ITeam';
 import Leaderboard from '../types/Leaderboard';
@@ -8,75 +9,74 @@ const sortLeaderboards = (leaderboards: Leaderboard[]) => leaderboards
 || b.totalVictories - a.totalVictories
 || b.goalsBalance - a.goalsBalance
 || b.goalsFavor - a.goalsFavor
-|| b.goalsOwn - a.goalsOwn);
+|| a.goalsOwn - b.goalsOwn);
 
-const teamObj: Leaderboard = {
-  name: '',
-  id: 0,
-  totalPoints: 0,
-  totalGames: 0,
-  totalVictories: 0,
-  totalLosses: 0,
-  totalDraws: 0,
-  goalsFavor: 0,
-  goalsOwn: 0,
-  goalsBalance: 0,
-  efficiency: 0,
+const getTotalPoints = (teamMatches: IMatch[]) => {
+  let totalPoints = 0;
+  teamMatches.forEach((match) => {
+    if (match.homeTeamGoals > match.awayTeamGoals) totalPoints += 3;
+    if (match.homeTeamGoals === match.awayTeamGoals) totalPoints += 1;
+  });
+  return totalPoints;
 };
-const generateTeamsArray = (matches: IMatch[], teams: ITeam[], homeOrAway: homeOrAwayType) =>
-  matches.reduce((acc: Leaderboard[], curr) => {
-    const currentTeam = teams.find((team) => team.id === curr[homeOrAway]);
-    if (acc.every((team) => team.id !== curr[homeOrAway])) {
-      teamObj.name = currentTeam?.teamName;
-      teamObj.id = curr[homeOrAway];
-      acc.push({ ...teamObj });
+
+const getTotalGames = (matches: IMatch[]) => matches.length;
+
+const getTotalVictories = (teamMatches: IMatch[]) => teamMatches
+  .filter((team) => team.homeTeamGoals > team.awayTeamGoals).length;
+
+const getTotalLosses = (teamMatches: IMatch[]) => teamMatches
+  .filter((team) => team.awayTeamGoals > team.homeTeamGoals).length;
+
+const getTotalDraws = (teamMatches: IMatch[]) => teamMatches
+  .filter((team) => team.awayTeamGoals === team.homeTeamGoals).length;
+
+const getGoalsFavor = (teamMatches: IMatch[]) => teamMatches
+  .reduce((acc, curr) => acc + curr.homeTeamGoals, 0);
+
+const getGoalsOwn = (teamMatches: IMatch[]) => teamMatches
+  .reduce((acc, curr) => acc + curr.awayTeamGoals, 0);
+
+const getEfficiency = (teamMatches: IMatch[]) => {
+  const totalGames = getTotalGames(teamMatches);
+  const totalPoints = getTotalPoints(teamMatches);
+  return ((totalPoints / (totalGames * 3)) * 100).toFixed(2);
+};
+
+const getLeaderboard = (matches: IMatch[]) => {
+  const result = matches.reduce((acc: any, curr: any) => {
+    const currentTeam = curr.teamHome.teamName;
+    if (acc.every((team: any) => team.name !== currentTeam)) {
+      const teamMatches = matches.filter((team: any) => team.teamHome.teamName === currentTeam);
+      acc.push({
+        name: curr.teamHome.teamName,
+        totalPoints: getTotalPoints(teamMatches),
+        totalGames: getTotalGames(teamMatches),
+        totalVictories: getTotalVictories(teamMatches),
+        totalLosses: getTotalLosses(teamMatches),
+        totalDraws: getTotalDraws(teamMatches),
+        goalsFavor: getGoalsFavor(teamMatches),
+        goalsOwn: getGoalsOwn(teamMatches),
+        goalsBalance: getGoalsFavor(teamMatches) - getGoalsOwn(teamMatches),
+        efficiency: Number(getEfficiency(teamMatches)),
+      });
     }
     return acc;
   }, []);
+  return result;
+};
 
-const updateHomeTeamScore = (teamsArray: Leaderboard[], matches: IMatch[]) =>
-  matches.reduce((acc, curr) => {
-    const currentTeam = acc.find((team) => team.id === curr.homeTeam);
-    if (!currentTeam) return acc;
-    if (curr.homeTeamGoals > curr.awayTeamGoals) currentTeam.totalVictories += 1;
-    if (curr.homeTeamGoals === curr.awayTeamGoals) currentTeam.totalDraws += 1;
-    if (curr.homeTeamGoals < curr.awayTeamGoals) currentTeam.totalLosses += 1;
-    currentTeam.totalPoints = (currentTeam.totalVictories * 3) + currentTeam.totalDraws;
-    currentTeam.totalGames += 1;
-    currentTeam.goalsFavor += curr.homeTeamGoals;
-    currentTeam.goalsOwn += curr.awayTeamGoals;
-    currentTeam.goalsBalance = currentTeam.goalsFavor - currentTeam.goalsOwn;
-    currentTeam.efficiency = (currentTeam.totalPoints / (currentTeam.totalGames * 3)) * 100;
-    return acc;
-  }, teamsArray);
-
-const updateAwayTeamScore = (teamsArray: Leaderboard[], matches: IMatch[]) =>
-  matches.reduce((acc, curr) => {
-    const currentTeam = acc.find((team) => team.id === curr.awayTeam);
-    if (!currentTeam) return acc;
-    if (curr.homeTeamGoals < curr.awayTeamGoals) currentTeam.totalVictories += 1;
-    if (curr.homeTeamGoals === curr.awayTeamGoals) currentTeam.totalDraws += 1;
-    if (curr.homeTeamGoals > curr.awayTeamGoals) currentTeam.totalLosses += 1;
-    currentTeam.totalPoints = (currentTeam.totalVictories * 3) + currentTeam.totalDraws;
-    currentTeam.totalGames += 1;
-    currentTeam.goalsFavor += curr.awayTeamGoals;
-    currentTeam.goalsOwn += curr.homeTeamGoals;
-    currentTeam.goalsBalance = currentTeam.goalsFavor - currentTeam.goalsOwn;
-    currentTeam.efficiency = (currentTeam.totalPoints / (currentTeam.totalGames * 3)) * 100;
-    return acc;
-  }, teamsArray);
-
-const updateTeamScore = (
-  teamsArray: Leaderboard[],
-  matches: IMatch[],
-  homeOrAway: homeOrAwayType,
-) => (homeOrAway === 'homeTeam' ? updateHomeTeamScore(teamsArray, matches)
-  : updateAwayTeamScore(teamsArray, matches));
+// const generateLeaderboards = (
+//   teamsArray: Leaderboard[],
+//   matches: IMatch[],
+//   homeOrAway: homeOrAwayType,
+// ) => (homeOrAway === 'homeTeam' ? generateHomeLeaderboards(teamsArray, matches)
+//   : generateAwayLeaderboards(teamsArray, matches));
 
 const utils = {
   sortLeaderboards,
-  generateTeamsArray,
-  updateTeamScore,
+  getLeaderboard,
+  // generateLeaderboards,
 };
 
 export default utils;
