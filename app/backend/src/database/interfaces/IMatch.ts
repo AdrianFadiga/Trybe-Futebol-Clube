@@ -1,4 +1,6 @@
 import Match from '../models/Match';
+import TeamHome from '../types/TeamHome';
+import TeamAway from '../types/TeamAway';
 
 interface IMatch extends Match {
   id: number;
@@ -7,6 +9,8 @@ interface IMatch extends Match {
   awayTeam: number;
   awayTeamGoals: number;
   inProgress: boolean;
+  teamHome: TeamHome;
+  teamAway: TeamAway;
 }
 
 export default IMatch;
