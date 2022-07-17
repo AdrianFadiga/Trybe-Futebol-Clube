@@ -58,11 +58,88 @@ describe('Teste da rota de Matches', () => {
         after(() => {
             (Match.findAll as sinon.SinonStub).restore();
         })
-    it('Retorna o status 200 com a lista de times', async () => {
+    it('Retorna o status 200 com a lista de partidas', async () => {
         const response = await chai.request(app).get('/matches')
             .send();
             expect(response.body).to.deep.equal(matchesMock);
             expect(response.status).to.equal(200);
     })
+    });
+    describe('get /matches?inProgress=false de SUCESSO', () => {
+        const matchesMock = {
+            id: 1,
+            homeTeam: 16,
+            homeTeamGoals: 1,
+            awayTeam: 8,
+            awayTeamGoals: 1,
+            inProgress: false,
+            teamHome: {
+                id: 16,
+                teamName: "São Paulo"
+            }
+        }
+        before(async () => {
+            sinon.stub(Match, 'findOne')
+            .resolves(matchesMock as IMatch)
+        });
+        after(() => {
+            (Match.findOne as sinon.SinonStub).restore();
+        });
+        it('Retorna o status 200 com uma partida', async () => {
+            const response = await chai.request(app).get('/matches?inProgress=false')
+            .send();
+            expect(response.body).to.deep.equal(matchesMock);
+            expect(response.status).to.equal(200);
+        })
+    });
+    describe('post /matches de SUCESSO', () => {
+        const matchesMock = {
+            id: 1,
+            homeTeam: 16,
+            homeTeamGoals: 1,
+            awayTeam: 8,
+            awayTeamGoals: 1,
+            inProgress: false,
+            teamHome: {
+                id: 16,
+                teamName: "São Paulo"
+            }
+        }
+        const createMock = {
+            id: 53,
+            homeTeam: 16,
+            awayTeam: 8,
+            homeTeamGoals: 2,
+            awayTeamGoals: 2,
+            inProgress: true
+        }
+        before(async () => {
+            sinon.stub(Match, 'findOne')
+            .resolves(matchesMock as IMatch)
+            sinon.stub(Match, 'create')
+            .resolves(createMock as any)
+            sinon.stub(User, "findOne")
+      .resolves({email: 'xablau@xablau.com'} as User);
+      sinon.stub(bcrypt, "compare")
+      .resolves(true)
+        })
+        after(() => {
+            (Match.findOne as sinon.SinonStub).restore();
+            (Match.create as sinon.SinonStub).restore();
+            (User.findOne as sinon.SinonStub).restore();
+            (bcrypt.compare as sinon.SinonStub).restore();
+        });
+        it('Retorna o status 201 com o objeto da partida criada', async () => {
+            const response = await chai.request(app).post('/matches')
+            .set('authorization', 'token123')
+            .send({
+                "homeTeam": 16,
+                "awayTeam": 8,
+                "homeTeamGoals": 2,
+                "awayTeamGoals": 2
+              });
+            expect(response.body).to.deep.equal(createMock);
+            expect(response.status).to.equal(201);
+        })
     })
 })
