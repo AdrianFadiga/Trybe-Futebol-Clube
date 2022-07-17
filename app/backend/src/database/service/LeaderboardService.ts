@@ -18,6 +18,14 @@ class LeaderboardService {
     const sortedLeaderboards = utils.sortLeaderboards(leaderboards);
     return sortedLeaderboards;
   }
+
+  static async getFullLeaderboard() {
+    const homeLeaderboard = await LeaderboardService.getLeaderboard('/home');
+    const awayLeaderboard = await LeaderboardService.getLeaderboard('/away');
+    const fullLeaderboard = utils.mergeLeaderboards(homeLeaderboard, awayLeaderboard);
+    const sortedLeaderboards = utils.sortLeaderboards(fullLeaderboard);
+    return sortedLeaderboards;
+  }
 }
 
 export default LeaderboardService;

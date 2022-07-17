@@ -53,7 +53,7 @@ const generateTeamLeaderboard = (
   teamMatches: IMatch[],
   homeTeam: boolean,
   currentTeam: string,
-) => ({
+): Leaderboard => ({
   name: currentTeam,
   totalPoints: getTotalPoints(teamMatches, homeTeam),
   totalGames: getTotalGames(teamMatches),
@@ -79,9 +79,35 @@ const getLeaderboard = (matches: IMatch[], homeTeam: boolean): Leaderboard[] => 
   }, []);
 };
 
+const generateMergedLeaderboard = (home: Leaderboard, away: Leaderboard) => ({
+  name: home.name,
+  totalPoints: home.totalPoints + away.totalPoints,
+  totalGames: home.totalGames + away.totalGames,
+  totalVictories: home.totalVictories + away.totalVictories,
+  totalLosses: home.totalLosses + away.totalLosses,
+  totalDraws: home.totalDraws + away.totalDraws,
+  goalsFavor: home.goalsFavor + away.goalsFavor,
+  goalsOwn: home.goalsOwn + away.goalsOwn,
+  goalsBalance: home.goalsBalance + away.goalsBalance,
+  efficiency: ((home.totalPoints + away.totalPoints)
+  / ((home.totalGames + away.totalGames) * 3)) * 100,
+});
+
+const mergeLeaderboards = (homeLeaderboard: Leaderboard[], awayLeaderboard: Leaderboard[]) =>
+  homeLeaderboard.reduce((acc, home: Leaderboard) => {
+    awayLeaderboard.forEach((away: Leaderboard) => {
+      if (away.name === home.name) {
+        const mergedLeaderboard = generateMergedLeaderboard(home, away);
+        acc.push(mergedLeaderboard);
+      }
+    });
+    return acc;
+  }, [] as Leaderboard[]);
+
 const utils = {
   sortLeaderboards,
   getLeaderboard,
+  mergeLeaderboards,
 };
 
 export default utils;

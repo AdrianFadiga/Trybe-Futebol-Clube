@@ -7,4 +7,6 @@ router.get('/home', LeaderboardController.getLeaderboard);
 
 router.get('/away', LeaderboardController.getLeaderboard);
 
+router.get('/', LeaderboardController.getFullLeaderboard);
+
 export default router;
