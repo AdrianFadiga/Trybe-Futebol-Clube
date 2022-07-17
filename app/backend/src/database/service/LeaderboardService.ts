@@ -4,7 +4,7 @@ import Team from '../models/Team';
 
 class LeaderboardService {
   static async getLeaderboard(path: string) {
-    // const homeOrAway = path === '/home' ? 'homeTeam' : 'awayTeam';
+    const homeOrAway = path === '/home' ? 'teamHome' : 'teamAway';
     const matches = await Match.findAll({ where: { inProgress: false },
       include: [{
         model: Team,
@@ -13,7 +13,7 @@ class LeaderboardService {
         model: Team,
         as: 'teamAway',
       }] });
-    const leaderboards = utils.getLeaderboard(matches);
+    const leaderboards = utils.getLeaderboard(matches, homeOrAway);
     const sortedLeaderboards = utils.sortLeaderboards(leaderboards);
     return sortedLeaderboards;
   }
