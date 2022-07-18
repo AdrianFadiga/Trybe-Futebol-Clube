@@ -2,6 +2,8 @@ import * as sinon from 'sinon';
 import * as chai from 'chai';
 import IMatch from '../database/interfaces/IMatch';
 import mocks from './mocks/mocks';
+import LeaderboardService from '../database/service/LeaderboardService';
+import utils from '../database/utils/utils';
 
 // @ts-ignore
 import chaiHttp = require('chai-http');
@@ -46,4 +48,18 @@ describe('Testa de rota de Leaderboard', () => {
             expect(response.status).to.be.equal(200);
         });  
     });
+    describe('Testa a rota get /leaderboard', () => {
+        before(async () => {
+            sinon.stub(Match, 'findAll')
+            .resolves(mocks.homeMatchMock as any);
+        })
+        after(async () => {
+            (Match.findAll as sinon.SinonStub).restore();
+        })
+        it('Retorna um array de times e o status 200', async () => {
+            const response = await chai.request(app).get('/leaderboard').send();
+            expect(response.body).to.be.deep.equal(mocks.fullLeaderboardSortedMock);
+            expect(response.status).to.be.equal(200);
+        })
+    })
 })
