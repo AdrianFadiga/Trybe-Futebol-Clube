@@ -20,11 +20,11 @@ class LeaderboardService {
   }
 
   static async getFullLeaderboard() {
-    const homeLeaderboard = await LeaderboardService.getLeaderboard('/home');
-    const awayLeaderboard = await LeaderboardService.getLeaderboard('/away');
-    const fullLeaderboard = utils.mergeLeaderboards(homeLeaderboard, awayLeaderboard);
-    const sortedLeaderboards = utils.sortLeaderboards(fullLeaderboard);
-    return sortedLeaderboards;
+    // const homeLeaderboard = await LeaderboardService.getLeaderboard('/home');
+    // const awayLeaderboard = await LeaderboardService.getLeaderboard('/away');
+    // const fullLeaderboard = utils.mergeLeaderboards(homeLeaderboard, awayLeaderboard);
+    // const sortedLeaderboards = utils.sortLeaderboards(fullLeaderboard);
+    // return sortedLeaderboards;
   }
 }
 
