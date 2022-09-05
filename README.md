@@ -3,10 +3,10 @@
 ## Iniciando a aplicação:
 
 1) Clone o repositório na sua máquina, através do comando:
-git clone git@github.com:AdrianFadiga/frontend-secret.git
+``git clone git@github.com:AdrianFadiga/frontend-secret.git``
 
 2) Inicialize os servidores Back-End e Front-End no Docker, através do comando:
-npm run compose:up:dev
+``npm run compose:up:dev``
 
 Atenção:
 - Você deve ter o Docker Compose instalado na sua máquina para inicializar a aplicação.
