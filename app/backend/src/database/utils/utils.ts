@@ -89,8 +89,8 @@ const generateMergedLeaderboard = (home: Leaderboard, away: Leaderboard) => ({
   goalsFavor: home.goalsFavor + away.goalsFavor,
   goalsOwn: home.goalsOwn + away.goalsOwn,
   goalsBalance: home.goalsBalance + away.goalsBalance,
-  efficiency: ((home.totalPoints + away.totalPoints)
-  / ((home.totalGames + away.totalGames) * 3)) * 100,
+  efficiency: Number((((home.totalPoints + away.totalPoints)
+  / ((home.totalGames + away.totalGames) * 3)) * 100).toFixed(2)),
 });
 
 const mergeLeaderboards = (homeLeaderboard: Leaderboard[], awayLeaderboard: Leaderboard[]) =>
